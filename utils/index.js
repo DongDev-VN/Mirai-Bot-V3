@@ -1,6 +1,21 @@
 const crypto = require('crypto');
 const os = require("os");
 
+module.exports.parseCookies = function(cookies) {
+    return (cookies.includes('useragent=') ? cookies.split('useragent=')[0] : cookies).split(';').map(pair => {
+            const [key, value] = pair.trim().split('=');
+            return value !== undefined ? {
+                key,
+                value,
+                domain: "facebook.com",
+                path: "/",
+                hostOnly: false,
+                creation: new Date().toISOString(),
+                lastAccessed: new Date().toISOString()
+            } : undefined;
+     }).filter(Boolean);
+};
+
 module.exports.throwError = function (command, threadID, messageID) {
 	const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};
 	return global.client.api.sendMessage(global.getText("utils", "throwError", ((threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : global.config.PREFIX), command), threadID, messageID);

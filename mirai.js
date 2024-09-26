@@ -97,13 +97,11 @@ try {
 }
 catch { return logger.loader(global.getText("mirai", "notFoundPathAppstate"), "error") }
 
-function onBot({ models: botModel }) {
-    const loginData = {};
-    loginData['appState'] = appState;
-    login(loginData, async(loginError, loginApiData) => {
+function onBot({ models }) {
+    login({ appState: global.utils.parseCookies(fs.readFileSync('./cookie.txt', 'utf8'))}, async (loginError, api) => {
         if (loginError) return logger(JSON.stringify(loginError), `ERROR`);
-        loginApiData.setOptions(global.config.FCAOption)
-        writeFileSync(appStateFile, JSON.stringify(loginApiData.getAppState(), null, '\x09'))
+        api.setOptions(global.config.FCA_Option);
+        writeFileSync('./utils/data/fbstate.json', JSON.stringify(api.getAppState(), null, 2));
         global.config.version = '1.2.14'
         global.client.timeStart = new Date().getTime(),
             function () {
