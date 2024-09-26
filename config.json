@@ -1,0 +1,33 @@
+{
+  "language": "vi",
+  "keyActive": "bok",
+  "DeveloperMode": false,
+  "autoCreateDB": true,
+  "allowInbox": true,
+  "autoClean": false,
+  "commandDisabled": [],
+  "eventDisabled": [],
+  "EMAIL": "",
+  "PASWORD": "",
+  "OTPKEY": "",
+  "BOTNAME": "𝓑𝓸𝓚",
+  "PREFIX": "!",
+  "ADMINBOT": [
+    "100037741424837"
+  ],
+  "NDH": [],
+  "DATABASE": {
+    "sqlite": {
+      "storage": "data.sqlite"
+    }
+  },
+  "APPSTATEPATH": "appstate.json",
+  "FCAOption": {
+    "forceLogin": true,
+    "listenEvents": true,
+    "pauseLog": true,
+    "logLevel": "error",
+    "selfListen": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
+  }
+}
