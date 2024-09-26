@@ -1,4 +1,3 @@
-const assets = require('@miraipr0ject/assets');
 const crypto = require('crypto');
 const os = require("os");
 
@@ -62,21 +61,6 @@ module.exports.randomString = function (length) {
 	var charactersLength = characters.length || 5;
 	for ( var i = 0; i < length; i++ ) result += characters.charAt(Math.floor(Math.random() * charactersLength));
 	return result;
-}
-
-module.exports.assets = {
-	async font (name) {
-		if (!assets.font.loaded) await assets.font.load();
-		return assets.font.get(name);
-	},
-	async image (name) {
-		if (!assets.image.loaded) await assets.image.load();
-		return assets.image.get(name);
-	},
-	async data (name) {
-		if (!assets.data.loaded) await assets.data.load();
-		return assets.data.get(name);
-	}
 }
 
 module.exports.AES = {
