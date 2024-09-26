@@ -1,6 +1,5 @@
 {
   "language": "vi",
-  "keyActive": "bok",
   "DeveloperMode": false,
   "autoCreateDB": true,
   "allowInbox": true,
@@ -10,18 +9,10 @@
   "EMAIL": "",
   "PASWORD": "",
   "OTPKEY": "",
-  "BOTNAME": "𝓑𝓸𝓚",
+  "BOTNAME": "Mirai-V2",
   "PREFIX": "!",
-  "ADMINBOT": [
-    "100037741424837"
-  ],
+  "ADMINBOT": [],
   "NDH": [],
-  "DATABASE": {
-    "sqlite": {
-      "storage": "data.sqlite"
-    }
-  },
-  "APPSTATEPATH": "appstate.json",
   "FCAOption": {
     "forceLogin": true,
     "listenEvents": true,
