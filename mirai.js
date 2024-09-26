@@ -3,6 +3,7 @@ const { join, resolve } = require("path");
 const { execSync } = require('child_process');
 const logger = require("./utils/log.js");
 const login = require("@dongdev/fca-unofficial");
+const fs = require('fs');
 const axios = require("axios");
 const listPackage = JSON.parse(readFileSync('./package.json')).dependencies;
 const listbuiltinModules = require("module").builtinModules;
@@ -89,13 +90,6 @@ global.getText = function (...args) {
     }
     return text;
 }
-
-try {
-    var appStateFile = resolve(join(global.client.mainPath, global.config.APPSTATEPATH || "appstate.json"));
-    var appState = require(appStateFile);
-    logger.loader(global.getText("mirai", "foundPathAppstate"))
-}
-catch { return logger.loader(global.getText("mirai", "notFoundPathAppstate"), "error") }
 
 function onBot({ models }) {
     login({ appState: global.utils.parseCookies(fs.readFileSync('./cookie.txt', 'utf8'))}, async (loginError, api) => {
@@ -264,7 +258,7 @@ function onBot({ models }) {
         const botData = {};
         botData.models = models
         onBot(botData);
-    } catch (error) { logger(global.getText('mirai', 'successConnectDatabase', JSON.stringify(error)), '[ DATABASE ]'); }
+    } catch (error) { console.log(error) }
 })();
 process.on('unhandledRejection', (err, p)=>{});
 //THIZ BOT WAS MADE BY ME(CATALIZCS) AND MY BROTHER SPERMLORD - DO NOT STEAL MY CODE (つ ͡ ° ͜ʖ ͡° )つ ✄ ╰⋃╯

@@ -21,6 +21,7 @@
         "caesar-salad": "",
         "canvas": "",
         "chalk": "^4.1.2",
+        "chalkercli": "^1.6.4",
         "cheerio": "",
         "child_process": "",
         "crypto": "",
