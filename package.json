@@ -15,7 +15,7 @@
     "author": "DongDev",
     "license": "GPL-3.0",
     "dependencies": {
-        "@dongdev/fca-unofficial": "^0.0.1",
+        "@dongdev/fca-unofficial": "^0.0.2",
         "axios": "",
         "body-parser": "",
         "caesar-salad": "",
