@@ -1,8 +1,13 @@
 const Sequelize = require("sequelize");
 const { resolve } = require("path");
-const storage = resolve(__dirname, `../data.sqlite`);
+const { DATABASE } = global.config;
+
+var dialect = Object.keys(DATABASE), storage;
+dialect = dialect[0]; 
+storage = resolve(__dirname, `../${DATABASE[dialect].storage}`);
+
 module.exports.sequelize = new Sequelize({
-	dialect: 'sqlite',
+	dialect,
 	storage,
 	pool: {
 		max: 20,

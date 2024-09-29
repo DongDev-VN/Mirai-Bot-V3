@@ -1,6 +1,6 @@
 {
-    "name": "Mirai-V2",
-    "version": "1.2.15",
+    "name": "MiraiBypassD-Jukie",
+    "version": "1.2.14",
     "description": "A simple Facebook Messenger Bot made by me(CatalizCS) and my brother SpermLord.",
     "main": "mirai.js",
     "scripts": {
@@ -10,35 +10,36 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/DongDevVN/Mirai-V2.git"
+        "url": "git+https://github.com/D-Jukie/miraiv2.git"
     },
-    "author": "DongDev",
-    "license": "GPL-3.0",
+    "author": "D-Jukie",
     "dependencies": {
-        "@dongdev/fca-unofficial": "^0.0.2",
+        "@miraipr0ject/assets": "^1.0.9",
         "axios": "",
         "body-parser": "",
         "caesar-salad": "",
         "canvas": "",
         "chalk": "^4.1.2",
-        "chalkercli": "^1.6.4",
         "cheerio": "",
         "child_process": "",
         "crypto": "",
+        "eval": "",
         "extract-zip": "",
         "figlet": "",
         "fs-extra": "",
+        "helyt": "",
         "jimp": "",
+        "minimist": "",
+        "moment": "^2.29.1",
         "moment-timezone": "",
-        "node-superfetch": "^0.2.3",
+        "ms": "",
         "npmlog": "",
         "path": "",
         "readline": "",
         "request": "",
         "semver": "",
         "sequelize": "",
-        "simple-youtube-api": "",
-        "sqlite3": "^5.0.8",
+        "sqlite3": "",
         "string-similarity": "",
         "totp-generator": ""
     }
