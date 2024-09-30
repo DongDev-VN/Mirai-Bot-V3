@@ -5,6 +5,9 @@ const logger = require("./utils/log.js");
 const login = require("@dongdev/fca-unofficial");
 const axios = require("axios");
 const fs = require('fs-extra');
+if (!fs.existsSync('./utils/data')) {
+  fs.mkdirSync('./utils/data', { recursive: true });
+}
 global.client = {
   commands: new Map(),
   events: new Map(),
