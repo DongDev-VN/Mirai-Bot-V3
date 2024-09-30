@@ -1,23 +1,17 @@
 module.exports = function ({ api, models, Users, Threads, Currencies }) {
-   const stringSimilarity = require('string-similarity'),
-        escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        logger =  require("../../utils/log.js");
+   const stringSimilarity = require('string-similarity'), escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), logger =  require("../../utils/log.js");
     const moment = require("moment-timezone");
     return async function ({ event }) {
     const dateNow = Date.now()
     const time = moment.tz("Asia/Ho_Chi_minh").format("HH:MM:ss DD/MM/YYYY");
     const { allowInbox, PREFIX, ADMINBOT, NDH, DeveloperMode, adminOnly } = global.config;
-
     const { userBanned, threadBanned, threadInfo, threadData, commandBanned } = global.data;
     const { commands, cooldowns } = global.client;
     var { body, senderID, threadID, messageID } = event;
-
-    var senderID = String(senderID), 
-        threadID = String(threadID);
+    var senderID = String(senderID), threadID = String(threadID);
     const threadSetting = threadData.get(threadID) || {}
-    
     const prefixRegex = new RegExp(`^(<@!?${senderID}>|${escapeRegex((threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : PREFIX )})\\s*`);
-        if (!prefixRegex.test(body)) return;
+        //if (!prefixRegex.test(body)) return;
         if (userBanned.has(senderID) || threadBanned.has(threadID) || allowInbox == ![] && senderID == threadID) {
             if (!ADMINBOT.includes(senderID.toString())) {
                 if (userBanned.has(senderID)) {
@@ -37,17 +31,37 @@ module.exports = function ({ api, models, Users, Threads, Currencies }) {
                 }
             }
         }
-        const [matchedPrefix] = body.match(prefixRegex), 
-        args = body.slice(matchedPrefix.length).trim().split(/ +/);
-        commandName = args.shift().toLowerCase();
+        body = body !== undefined ? body : 'x'
+        const [matchedPrefix] = body.match(prefixRegex) || ['']
+        var args = body.slice(matchedPrefix.length).trim().split(/ +/);
+        var commandName = args.shift().toLowerCase();
         var command = commands.get(commandName);
+        if (!prefixRegex.test(body)) {
+            args = (body || '').trim().split(/ +/);
+            commandName = args.shift()?.toLowerCase();
+            command = commands.get(commandName);
+            if (command && command.config) {
+                if (command.config.prefix === false && commandName.toLowerCase() !== command.config.name.toLowerCase()) {
+                    return;
+                }
+                if (command.config.prefix === true && !body.startsWith(PREFIX)) {
+                    return;
+                }
+            }
+            if (command && command.config) {
+                if (typeof command.config.prefix === 'undefined') {
+                    return;
+                }
+            }
+        }
         if (!command) {
+            if (!body.startsWith((threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : PREFIX)) return;
             var allCommandName = [];
             const commandValues = commands['keys'](); 
             for (const cmd of commandValues) allCommandName.push(cmd)
             const checker = stringSimilarity.findBestMatch(commandName, allCommandName);
             if (checker.bestMatch.rating >= 0.5) command = client.commands.get(checker.bestMatch.target);
-            else return api.sendMessage(global.getText("handleCommand", "commandNotExist", checker.bestMatch.target), threadID);
+            else return api.sendMessage(`❎ Lệnh không tồn tại, lệnh gần giống là: ${checker.bestMatch.target}`, threadID, messageID);
         }  
         if (commandBanned.get(threadID) || commandBanned.get(senderID)) {
             if (!ADMINBOT.includes(senderID)) {

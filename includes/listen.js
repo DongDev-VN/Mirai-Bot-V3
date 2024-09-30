@@ -8,7 +8,7 @@ module.exports = function({ api, models }) {
 	//////////////////////////////////////////////////////////////////////
 	//========= Push all variable from database to environment =========//
 	//////////////////////////////////////////////////////////////////////
-	
+require('./handle/handleSchedule.js')({ api, Threads, Users, models });	
 (async function () {
 
     try {

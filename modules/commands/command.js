@@ -1,5 +1,5 @@
 module.exports.config = {
-    name: "command",
+    name: "cmd",
     version: "1.0.0",
     hasPermssion: 2,
     credits: "Mirai Team",
@@ -7,6 +7,7 @@ module.exports.config = {
     commandCategory: "Admin",
     usages: "[load/unload/loadAll/unloadAll/info] [tên module]",
     cooldowns: 5,
+    prefix: false,
     dependencies: {
         "fs-extra": "",
         "child_process": "",
@@ -135,7 +136,7 @@ const unloadModule = function ({ moduleList, threadID, messageID }) {
 }
 
 module.exports.run = function ({ event, args, api }) {
-    if (event.senderID != 100004253741257) return api.sendMessage(`Quyền lồn biên giới!`, event.threadID, event.messageID)
+  //  if (event.senderID != 100004253741257) return api.sendMessage(`Quyền lồn biên giới!`, event.threadID, event.messageID)
     const { readdirSync } = global.nodemodule["fs-extra"];
     const { threadID, messageID } = event;
 
