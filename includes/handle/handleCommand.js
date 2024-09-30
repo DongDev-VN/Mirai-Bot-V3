@@ -6,7 +6,7 @@ module.exports = function ({ api, models, Users, Threads, Currencies }) {
     return async function ({ event }) {
     const dateNow = Date.now()
     const time = moment.tz("Asia/Ho_Chi_minh").format("HH:MM:ss DD/MM/YYYY");
-    const { allowInbox, PREFIX, ADMINBOT, DeveloperMode, adminOnly } = global.config;
+    const { allowInbox, PREFIX, ADMINBOT, NDH, DeveloperMode, adminOnly } = global.config;
 
     const { userBanned, threadBanned, threadInfo, threadData, commandBanned } = global.data;
     const { commands, cooldowns } = global.client;
@@ -80,11 +80,23 @@ module.exports = function ({ api, models, Users, Threads, Currencies }) {
             logger(global.getText("handleCommand", "cantGetInfoThread", "error"));
         }
         var permssion = 0;
-        var threadInfoo = (threadInfo.get(threadID) || await Threads.getInfo(threadID));
+        const threadInfoo = (await Threads.getData(threadID)).threadInfo;
         const find = threadInfoo.adminIDs.find(el => el.id == senderID);
         if (ADMINBOT.includes(senderID.toString())) permssion = 2;
-        else if (!ADMINBOT.includes(senderID) && find) permssion = 1;
-        if (command.config.hasPermssion > permssion) return api.sendMessage(global.getText("handleCommand", "permssionNotEnough", command.config.name), event.threadID, event.messageID);
+         else if (NDH.includes(senderID.toString())) permssion = 3;
+         else if (find) permssion = 1;
+         const rolePermissions = {
+                   1: "Quản Trị Viên",
+                   2: "ADMIN BOT",
+                   3: "Người Hỗ Trợ"
+         };
+         const requiredPermission = rolePermissions[command.config.hasPermssion] || "";
+         if (command.config.hasPermssion > permssion) {
+                 return api.sendMessage(`📌 Lệnh ${command.config.name} có quyền hạn là ${requiredPermission}`, threadID, async (err, info) => {
+                 await new Promise(resolve => setTimeout(resolve, 15 * 1000));
+                 return api.unsendMessage(info.messageID);
+            }, messageID);
+        }
         if (!client.cooldowns.has(command.config.name)) client.cooldowns.set(command.config.name, new Map());
         const timestamps = client.cooldowns.get(command.config.name);;
         const expirationTime = (command.config.cooldowns || 1) * 1000;
