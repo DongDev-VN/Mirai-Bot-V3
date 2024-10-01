@@ -70,12 +70,11 @@ function onBot({ models }) {
         const user = await api.getUserInfo([userId]);
         const userName = user[userId]?.name || null;
         logger(`Đăng nhập thành công - ${userName} (${userId})`, '[ LOGIN ] >');
-        console.log(require('chalk').yellow("             _                  _                    ___  " + "\n" +
-          "            (_)                (_)                  |__  \\ " + "\n" +
-          " _ __ ___    _   _ __    __ _   _   ______  __   __    ) |" + "\n" +
-          "| '_ ` _ \\  | | | '__|  / _` | | | |______| \\ \\ / /   / / " + "\n" +
-          "| | | | | | | | | |    | (_| | | |           \\ V /   / /_ " + "\n" +
-          "|_| |_| |_| |_| |_|     \\__,_| |_|            \\_/   |____|\n"));
+        console.log(require('chalk').yellow(" __  __ ___ ____      _    ___      ____   ___ _____  __     _______" + "\n" + 
+          "|  \\/  |_ _|  _ \\    / \\  |_ _|    | __ ) / _ \\_   _| \\ \\   / /___ / " + "\n" +
+          "| |\\/| || || |_) |  / _ \\  | |_____|  _ \\| | | || |____\\ \\ / /  |_ \\ " + "\n" +
+          "| |  | || ||  _ <  / ___ \\ | |_____| |_) | |_| || |_____\\ V /  ___) |" + "\n" +
+          "|_|  |_|___|_| \\_\\/_/   \\_\\___|    |____/ \\___/ |_|      \\_/  |____/ \n"));
         (function () {
             const loadModules = (path, collection, disabledList, type) => {
               const items = readdirSync(path).filter(file => file.endsWith('.js') && !file.includes('example') && !disabledList.includes(file));
