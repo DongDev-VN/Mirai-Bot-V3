@@ -15,6 +15,7 @@
         "@distube/ytdl-core": "^4.14.4",
         "@dongdev/fca-unofficial": "^0.0.4",
         "axios": "^1.7.7",
+        "bluebird": "^2.11.0",
         "body-parser": "^1.20.3",
         "caesar-salad": "^2.1.0",
         "canvas": "^2.11.2",
@@ -27,8 +28,10 @@
         "figlet": "^1.7.0",
         "fs-extra": "^11.2.0",
         "gradient-string": "^2.0.2",
+        "https-proxy-agent": "^7.0.5",
         "jimp": "^1.6.0",
         "moment-timezone": "^0.5.45",
+        "mqtt": "^4.3.8",
         "node-cron": "^3.0.3",
         "npmlog": "^7.0.1",
         "path": "^0.12.7",
@@ -38,6 +41,7 @@
         "sqlite3": "^5.1.7",
         "string-similarity": "^4.0.4",
         "totp-generator": "^1.0.0",
+        "websocket-stream": "^5.5.2",
         "youtube-search-api": "^1.2.2"
     }
 }

@@ -2,7 +2,7 @@ const { readdirSync, readFileSync, writeFileSync, existsSync, unlinkSync, rm } =
 const { join, resolve } = require("path");
 const { execSync } = require('child_process');
 const logger = require("./utils/log.js");
-const login = require("@dongdev/fca-unofficial");
+const login = require("./fb-chat-api");
 const axios = require("axios");
 const fs = require('fs-extra');
 if (!fs.existsSync('./utils/data')) {
