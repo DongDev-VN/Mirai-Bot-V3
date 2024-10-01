@@ -12,6 +12,7 @@
     },
     "author": "DongDev",
     "dependencies": {
+        "@distube/ytdl-core": "^4.14.4",
         "@dongdev/fca-unofficial": "^0.0.4",
         "axios": "^1.7.7",
         "body-parser": "^1.20.3",
@@ -21,6 +22,7 @@
         "cheerio": "^1.0.0",
         "child_process": "^1.0.2",
         "crypto": "^1.0.1",
+        "eval": "^0.1.8",
         "extract-zip": "^2.0.1",
         "figlet": "^1.7.0",
         "fs-extra": "^11.2.0",
@@ -35,6 +37,7 @@
         "sequelize": "^6.37.3",
         "sqlite3": "^5.1.7",
         "string-similarity": "^4.0.4",
-        "totp-generator": "^1.0.0"
+        "totp-generator": "^1.0.0",
+        "youtube-search-api": "^1.2.2"
     }
 }

@@ -66,6 +66,16 @@ function onBot({ models }) {
         global.config.version = '2.0.0';
         global.client.timeStart = new Date().getTime();
         global.client.api = api;
+        const userId = api.getCurrentUserID();
+        const user = await api.getUserInfo([userId]);
+        const userName = user[userId]?.name || null;
+        logger(`Đăng nhập thành công - ${userName} (${userId})`, '[ LOGIN ] >');
+        console.log(require('chalk').yellow("             _                  _                    ___  " + "\n" +
+          "            (_)                (_)                  |__  \\ " + "\n" +
+          " _ __ ___    _   _ __    __ _   _   ______  __   __    ) |" + "\n" +
+          "| '_ ` _ \\  | | | '__|  / _` | | | |______| \\ \\ / /   / / " + "\n" +
+          "| | | | | | | | | |    | (_| | | |           \\ V /   / /_ " + "\n" +
+          "|_| |_| |_| |_| |_|     \\__,_| |_|            \\_/   |____|\n"));
         (function () {
             const loadModules = (path, collection, disabledList, type) => {
               const items = readdirSync(path).filter(file => file.endsWith('.js') && !file.includes('example') && !disabledList.includes(file));
@@ -143,12 +153,6 @@ function onBot({ models }) {
         connect_mqtt();
     });
 }
-console.log(require('chalk').yellow("             _                  _                    ___  " + "\n" +
-"            (_)                (_)                  |__  \\ " + "\n" +
-" _ __ ___    _   _ __    __ _   _   ______  __   __    ) |" + "\n" +
-"| '_ ` _ \\  | | | '__|  / _` | | | |______| \\ \\ / /   / / " + "\n" +
-"| | | | | | | | | |    | (_| | | |           \\ V /   / /_ " + "\n" +
-"|_| |_| |_| |_| |_|     \\__,_| |_|            \\_/   |____|\n"));
 (async() => {
     try {
         const { Sequelize, sequelize } = require("./includes/database");
