@@ -17,7 +17,6 @@
 <strong>Mirai Bot V3 Unofficial</strong> Là một dự án được DongDev update và tiếp tục phát triển từ project Mirai-V2 của Catalizcs and SpermLord xây dựng.
 </p>
 
-<!-- INSTALLATION -->
 ## 📜 **Installation**
 
 Sau đây là các bước cơ bản để có thể cài đặt và vận hành.
@@ -40,7 +39,7 @@ Sau đây là các bước cơ bản để có thể cài đặt và vận hành
     1. chuột phải ở folder cần cài đặt source code nhấn vào git bash
     2. nhập
     ```sh
-    git clone https://github.com/maihuybao/MiraiBypassGban.git miraiv2
+    git clone https://github.com/DongDev-VN/Mirai-Bot-V3 Mirai-Bot-V3
     ```
     
 3. Cài đặt các package cần thiết
@@ -65,7 +64,6 @@ Sau đây là các bước cơ bản để có thể cài đặt và vận hành
       ```
     2. Đợi source code load file và tận hưởng!
 
-<!-- CONTRIBUTING -->
 ## 📚 **Contributing**
 
 Sự đóng góp của bạn sẽ khiến cho project ngày càng tốt hơn, các bước để bạn có thể đóng góp
