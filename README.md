@@ -1,8 +1,9 @@
-# Mirai Bot V3 Unofficial🤖<sub><sub>v3.0.0🚀</sub></sub>
+# Mirai Bot Unofficial🤖<sub><sub>v3.0.0🚀</sub></sub>
 <p align="center">
     <a href="https://nodejs.org/dist/v20.17.0"><img src="https://img.shields.io/badge/Nodejs%20Support-20.x-brightgreen.svg?style=flat-square" alt="Nodejs Support v20.x"></a>
     <img alt="size" src="https://img.shields.io/github/repo-size/DongDev-VN/Mirai-Bot-V3.svg?style=flat-square&label=size">
-    <img alt="code-version" src="https://img.shields.io/badge/dynamic/json?color=red&label=code%20version&prefix=v&query=%24.version&url=https://raw.githubusercontent.com/DongDev-VN/Mirai-Bot-V3/refs/heads/master/package.json&style=flat-square"><a href="https://github.com/DongDev-VN/Mirai-Bot-V3/commits"><img alt="Commits" src="https://img.shields.io/github/commit-activity/m/DongDev-VN/Mirai-Bot-V3.svg?label=commit&style=flat-square"></a>
+    <img alt="code-version" src="https://img.shields.io/badge/dynamic/json?color=red&label=code%20version&prefix=v&query=%24.version&url=https://raw.githubusercontent.com/DongDev-VN/Mirai-Bot-V3/refs/heads/master/package.json&style=flat-square">
+    <a href="https://github.com/DongDev-VN/Mirai-Bot-V3/commits"><img alt="Commits" src="https://img.shields.io/github/commit-activity/m/DongDev-VN/Mirai-Bot-V3.svg?label=commit&style=flat-square"></a>
 <img alt="Visitors" src="https://visitor-badge.laobi.icu/badge?page_id=DongDev-VN.Mirai-Bot-V3">
 <img alt="size" src="https://img.shields.io/badge/license-GPL--3.0-green?style=flat-square&color=brightgreen">
 <a href="https://github.com/DongDev-VN/Mirai-Bot-V3"><img src="https://i.imgur.com/sxW5AWa.png" alt="Logo"></a>
@@ -10,12 +11,12 @@
     A Simple MiraiBot for starting a Messenger Chatbot.
     <br />
     <br />
+    
 ## introduce
 <p>
 <strong>Mirai Bot V3 Unofficial</strong> Là một dự án được DongDev update và tiếp tục phát triển từ project Mirai-V2 của Catalizcs and SpermLord xây dựng.
 </p>
 
-<!-- INSTALLATION -->
 ## 📜 **Installation**
 
 Sau đây là các bước cơ bản để có thể cài đặt và vận hành.
@@ -38,7 +39,7 @@ Sau đây là các bước cơ bản để có thể cài đặt và vận hành
     1. chuột phải ở folder cần cài đặt source code nhấn vào git bash
     2. nhập
     ```sh
-    git clone https://github.com/maihuybao/MiraiBypassGban.git miraiv2
+    git clone https://github.com/DongDev-VN/Mirai-Bot-V3 Mirai-Bot-V3
     ```
     
 3. Cài đặt các package cần thiết
@@ -63,7 +64,6 @@ Sau đây là các bước cơ bản để có thể cài đặt và vận hành
       ```
     2. Đợi source code load file và tận hưởng!
 
-<!-- CONTRIBUTING -->
 ## 📚 **Contributing**
 
 Sự đóng góp của bạn sẽ khiến cho project ngày càng tốt hơn, các bước để bạn có thể đóng góp
