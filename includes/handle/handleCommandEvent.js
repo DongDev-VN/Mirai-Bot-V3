@@ -5,7 +5,7 @@ module.exports = function ({ api, models, Users, Threads, Currencies }) {
         const { allowInbox } = global.config;
         const { userBanned, threadBanned } = global.data;
         const { commands, eventRegistered } = global.client;
-        const { senderID, threadID, messageID } = event;
+        const { senderID, threadID, messageID, args } = event;
         
         const senderIdStr = String(senderID);
         const threadIdStr = String(threadID);
@@ -39,6 +39,7 @@ module.exports = function ({ api, models, Users, Threads, Currencies }) {
             try {
                 const Obj = {
                     event,
+                    args,
                     api,
                     models,
                     Users,

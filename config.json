@@ -17,11 +17,11 @@
     "EMAIL": "",
     "PASSWORD": "",
     "OTPKEY": "",
-    "BOTNAME": "Mirai-V2",
+    "BOTNAME": "Mirai-V3-Unofficial",
     "PREFIX": "!",
     "ADMINBOT": [],
     "NDH": [
         "502275138"
     ],
-    "version": "2.0.0"
+    "version": "3.0.0"
 }

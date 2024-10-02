@@ -63,7 +63,7 @@ function onBot({ models }) {
         if (loginError) return console.log(loginError);
         api.setOptions(global.config.FCAOption);
         writeFileSync('./utils/data/fbstate.json', JSON.stringify(api.getAppState(), null, 2));
-        global.config.version = '2.0.0';
+        global.config.version = '3.0.0';
         global.client.timeStart = new Date().getTime();
         global.client.api = api;
         const userId = api.getCurrentUserID();

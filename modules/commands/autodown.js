@@ -12,12 +12,12 @@ this.config = {
   cooldowns: 5,
   prefix: true
 };
-this.handleEvent = async ({ api, event }) => {
+this.handleEvent = async ({ api, event, args }) => {
   if (event.senderID == api.getCurrentUserID()) return;
   let stream = (url, ext = 'jpg') => require('axios').get(url, { responseType: 'stream' }).then(res => (res.data.path = `tmp.${ext}`, res.data)).catch(e => null);
   const send = (msg) => api.sendMessage(msg, event.threadID, event.messageID);
   const head = app => `[ AUTODOWN - ${app} ]\n────────────────`;
-  for (const url of event.args) {
+  for (const url of args) {
     if (/(^https:\/\/)(\w+\.|m\.)?(facebook|fb)\.(com|watch)\//.test(url)) {
       const res = (await axios.get(`${BASE_URL}?url=${encodeURIComponent(url)}`)).data;
       if (res.attachments && res.attachments.length > 0) {
