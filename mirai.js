@@ -121,7 +121,7 @@ function onBot({ models }) {
           if (error) {
             if (JSON.stringify(error).includes("601051028565049")) {
               const form = {
-                av: loginApiData.getCurrentUserID(),
+                av: api.getCurrentUserID(),
                 fb_api_caller_class: "RelayModern",
                 fb_api_req_friendly_name: "FBScrapingWarningMutation",
                 variables: "{}",
