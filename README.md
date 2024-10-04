@@ -12,7 +12,7 @@
     <br />
     <br />
     
-## introduce
+## 📝 **introduce**
 <p>
 <strong>Mirai Bot V3 Unofficial</strong> Là một dự án được DongDev update và tiếp tục phát triển từ project Mirai-V2 của Catalizcs and SpermLord xây dựng.
 </p>
