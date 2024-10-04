@@ -144,6 +144,7 @@ module.exports = function ({ api, models, Users, Threads, Currencies }) {
             logger(global.getText("handleCommand", "executeCommand", time, commandName, senderID, threadID, args.join(" ") , (Date.now()) - dateNow), "[ DEV MODE ]");
             return;
         } catch (e) {
+            console.log(e);
             return api.sendMessage(global.getText("handleCommand", "commandError", commandName, e), threadID);
         }
     };
