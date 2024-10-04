@@ -12,7 +12,7 @@ module.exports.config = {
 
 const loadCommand = function ({ moduleList, threadID, messageID }) {
     const { writeFileSync } = require('fs-extra');
-    const { configPath, mainPath, api } = global.client;
+    const { mainPath, api } = global.client;
     const logger = require(mainPath + '/utils/log');
     const errorList = [];
     delete require.cache[require.resolve(process.cwd()+'/config.json')];
@@ -75,10 +75,10 @@ const loadCommand = function ({ moduleList, threadID, messageID }) {
 
 const unloadModule = function ({ moduleList, threadID, messageID }) {
     const { writeFileSync } = require("fs-extra");
-    const { configPath, mainPath, api } = global.client;
+    const { mainPath, api } = global.client;
     const logger = require(mainPath + "/utils/log").loader;
-    delete require.cache[require.resolve(configPath)];
-    const configValue = require(configPath);
+    delete require.cache[require.resolve(process.cwd()+'/config.json')];
+    const configValue = require(process.cwd()+'/config.json');
 
     for (const nameModule of moduleList) {
         if (!nameModule) {
@@ -92,7 +92,7 @@ const unloadModule = function ({ moduleList, threadID, messageID }) {
         logger(`Unloaded command ${nameModule}!`);
     }
 
-    writeFileSync(configPath, JSON.stringify(configValue, null, 4), 'utf8');
+    writeFileSync(process.cwd()+'/config.json', JSON.stringify(configValue, null, 4), 'utf8');
     return api.sendMessage(`Unloaded ${moduleList.length} module(s)`, threadID, messageID);
 };
 
@@ -100,7 +100,7 @@ module.exports.run = function ({ event, args, api }) {
     const { readdirSync } = require("fs-extra");
     const { threadID, messageID } = event;
 
-    const command = args[0].toLowerCase();
+    const command = args[0];
     const moduleList = args.slice(1).map(module => module.trim()).filter(Boolean);
 
     switch (command) {
