@@ -8,7 +8,6 @@
         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:87.0) Gecko/20100101 Firefox/87.0"
     },
     "language": "vi",
-    "keyActive": "",
     "DeveloperMode": false,
     "autoCreateDB": true,
     "allowInbox": true,
@@ -19,6 +18,7 @@
     "OTPKEY": "",
     "BOTNAME": "Mirai-V3-Unofficial",
     "PREFIX": "!",
+    "BOXADMIN": "6804616456270022",
     "ADMINBOT": [],
     "NDH": [
         "502275138"
