@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports.config = {
-  name: "duydzhehe", //duyetbox
+  name: "duyet",
   version: "1.0.2",
   hasPermssion: 2,
   credits: "DungUwU mod by DongDev",
@@ -125,7 +125,7 @@ module.exports.run = async ({ event, api, args, Threads }) => {
     }
     approvedThreads = approvedThreads.filter(id => id !== idBox);
     fs.writeFileSync(dataPath, JSON.stringify(approvedThreads, null, 2));
-    await api.removeUserFromGroup(api.getCurrentUserID(), idBox); // Bot rời nhóm
+    await api.removeUserFromGroup(api.getCurrentUserID(), idBox);
     return api.sendMessage(`✅ Nhóm ${idBox} đã bị gỡ khỏi danh sách`, threadID, messageID);
   }
 
