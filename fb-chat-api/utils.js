@@ -1009,6 +1009,19 @@ function parseAndCheckLogin(ctx, defaultFuncs, retryCount) {
 }
 
 function saveCookies(jar) {
+    return function(res) {
+        var cookies = res.headers["set-cookie"] || [];
+        cookies.forEach(function(c) {
+            if (c.indexOf(".facebook.com") > -1) {
+                jar.setCookie(c, "https://www.facebook.com");
+                jar.setCookie(c.replace(/domain=\.facebook\.com/, "domain=.messenger.com"), "https://www.messenger.com");
+            }
+        });
+        return res;
+    };
+}
+/*
+function saveCookies(jar) {
 	return function (res) {
 		var cookies = res.headers["set-cookie"] || [];
 		cookies.forEach(function (c) {
@@ -1018,7 +1031,7 @@ function saveCookies(jar) {
 		});
 		return res;
 	};
-}
+}*/
 
 var NUM_TO_MONTH = [
 	"Jan",
