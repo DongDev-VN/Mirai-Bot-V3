@@ -2,14 +2,14 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports.config = {
-  name: "duyet",
+  name: "duydzhehe", //duyetbox
   version: "1.0.2",
   hasPermssion: 2,
   credits: "DungUwU mod by DongDev",
   description: "duyệt box dùng bot xD",
   commandCategory: "Admin",
   cooldowns: 5,
-  prefix: true
+  prefix: false
 };
 
 const dataPath = path.resolve(__dirname, "../../utils/data/approvedThreads.json");
