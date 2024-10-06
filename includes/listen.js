@@ -157,9 +157,11 @@ module.exports = function({
         });
         break;
       case "event":
-        await handlers['handleEvent']({
+        await Promise.all([ handlers['handleEvent']({
           event
-        });
+        }),
+        handlers['handleRefresh']({ event }),
+        ]);
         break;
       case "message_reaction":
         await handlers['handleReaction']({
