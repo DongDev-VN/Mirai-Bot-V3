@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports.config = {
-  name: "duyet",
+  name: "duyet", //duyetbox
   version: "1.0.2",
   hasPermssion: 2,
   credits: "DungUwU mod by DongDev",

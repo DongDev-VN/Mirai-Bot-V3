@@ -7,7 +7,7 @@ module.exports.config = {
     commandCategory: "Admin",
     usages: "[load/unload/loadAll/unloadAll/info] [tên module]",
     cooldowns: 5,
-    prefix: true
+    prefix: false
 };
 
 const loadCommand = function ({ moduleList, threadID, messageID }) {

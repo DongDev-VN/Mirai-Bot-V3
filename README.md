@@ -2,7 +2,7 @@
 <p align="center">
     <a href="https://nodejs.org/dist/v20.17.0"><img src="https://img.shields.io/badge/Nodejs%20Support-20.x-brightgreen.svg?style=flat-square" alt="Nodejs Support v20.x"></a>
     <img alt="size" src="https://img.shields.io/github/repo-size/DongDev-VN/Mirai-Bot-V3.svg?style=flat-square&label=size">
-    <img alt="code-version" src="https://img.shields.io/badge/dynamic/json?color=red&label=code%20version&prefix=v&query=%24.version&url=https://raw.githubusercontent.com/DongDev-VN/Mirai-Bot-V3/refs/heads/master/package.json&style=flat-square">
+    <img alt="code-version" src="https://img.shields.io/badge/dynamic/json?color=red&label=code%20version&prefix=v&query=%24.version&url=https://raw.githubusercontent.com/DongDev-VN/Mirai-Bot-V3/refs/heads/main/package.json&style=flat-square">
     <a href="https://github.com/DongDev-VN/Mirai-Bot-V3/commits"><img alt="Commits" src="https://img.shields.io/github/commit-activity/m/DongDev-VN/Mirai-Bot-V3.svg?label=commit&style=flat-square"></a>
 <img alt="Visitors" src="https://visitor-badge.laobi.icu/badge?page_id=DongDev-VN.Mirai-Bot-V3">
 <img alt="size" src="https://img.shields.io/badge/license-GPL--3.0-green?style=flat-square&color=brightgreen">
