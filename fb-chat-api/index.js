@@ -149,7 +149,9 @@ function buildAPI(globalOptions, html, jar, bypass_region_err) {
     syncToken: undefined,
     mqttEndpoint,
     region,
-    firstListen: true
+    firstListen: true,
+	wsReqNumber: 0,
+    wsTaskNumber: 0,
   };
 
   var api = {
