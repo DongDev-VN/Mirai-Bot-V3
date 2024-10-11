@@ -23,5 +23,11 @@
     "NDH": [
         "502275138"
     ],
-    "version": "3.0.0"
+    "version": "3.0.0",
+    "menu": {
+        "autoUnsend": {
+            "status": true,
+            "timeOut": 60
+        }
+    }
 }

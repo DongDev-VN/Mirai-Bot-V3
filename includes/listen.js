@@ -134,6 +134,8 @@ module.exports = function({
     });
     switch (event.type) {
       case "message":
+      case "message_reply":
+      case "message_unsend":
         await Promise.all([
           handlers['handleCommand']({
             event
@@ -145,16 +147,6 @@ module.exports = function({
             event
           })
         ]);
-        break;
-      case "message_reply":
-        await handlers['handleReply']({
-          event
-        });
-        break;
-      case "message_unsend":
-        await handlers['handleCommandEvent']({
-          event
-        });
         break;
       case "event":
         await Promise.all([ handlers['handleEvent']({
