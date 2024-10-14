@@ -7,7 +7,6 @@ function startBot(message) {
         stdio: "inherit",
         shell: true
     });
-
     child.on("close", (codeExit) => {
         if (codeExit != 0 || global.countRestart && global.countRestart < 5) {
             startBot("Restarting...");
