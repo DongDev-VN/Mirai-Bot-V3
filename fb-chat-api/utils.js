@@ -6,6 +6,7 @@ const stream = require("stream");
 const log = require("npmlog");
 const querystring = require("querystring");
 const url = require("url");
+var bluebird = require("bluebird");
 
 class CustomError extends Error {
 	constructor(obj) {
@@ -1209,113 +1210,48 @@ function makeDefaults(html, userID, ctx) {
 	};
 }
 
-function parseAndCheckLogin(ctx, defaultFuncs, retryCount, sourceCall) {
-	if (retryCount == undefined) {
-		retryCount = 0;
-	}
-	if (sourceCall == undefined) {
-		try {
-			throw new Error();
-		}
-		catch (e) {
-			sourceCall = e;
-		}
-	}
+function parseAndCheckLogin(ctx, defaultFuncs, retryCount) {
+	if (retryCount == undefined) retryCount = 0;
 	return function (data) {
-		return tryPromise(function () {
+		return bluebird.try(function () {
 			log.verbose("parseAndCheckLogin", data.body);
 			if (data.statusCode >= 500 && data.statusCode < 600) {
 				if (retryCount >= 5) {
-					throw new CustomError({
-						message: "Request retry failed. Check the `res` and `statusCode` property on this error.",
-						statusCode: data.statusCode,
-						res: data.body,
+					throw {
 						error: "Request retry failed. Check the `res` and `statusCode` property on this error.",
-						sourceCall: sourceCall
-					});
+						statusCode: data.statusCode,
+						res: data.body
+					};
 				}
 				retryCount++;
-				const retryTime = Math.floor(Math.random() * 5000);
-				log.warn(
-					"parseAndCheckLogin",
-					"Got status code " +
-					data.statusCode +
-					" - " +
-					retryCount +
-					". attempt to retry in " +
-					retryTime +
-					" milliseconds..."
-				);
-				const url =
-					data.request.uri.protocol +
-					"//" +
-					data.request.uri.hostname +
-					data.request.uri.pathname;
-				if (
-					data.request.headers["Content-Type"].split(";")[0] ===
-					"multipart/form-data"
-				) {
-					return delay(retryTime)
-						.then(function () {
-							return defaultFuncs.postFormData(
-								url,
-								ctx.jar,
-								data.request.formData,
-								{}
-							);
-						})
-						.then(parseAndCheckLogin(ctx, defaultFuncs, retryCount, sourceCall));
-				}
-				else {
-					return delay(retryTime)
-						.then(function () {
-							return defaultFuncs.post(url, ctx.jar, data.request.formData);
-						})
-						.then(parseAndCheckLogin(ctx, defaultFuncs, retryCount, sourceCall));
-				}
+				var retryTime = Math.floor(Math.random() * 5000);
+				log.warn("parseAndCheckLogin", "Got status code " + data.statusCode + " - " + retryCount + ". attempt to retry in " + retryTime + " milliseconds...");
+				var url = data.request.uri.protocol + "//" + data.request.uri.hostname + data.request.uri.pathname;
+				if (data.request.headers["Content-Type"].split(";")[0] === "multipart/form-data") return bluebird.delay(retryTime).then(() => defaultFuncs.postFormData(url, ctx.jar, data.request.formData, {})).then(parseAndCheckLogin(ctx, defaultFuncs, retryCount));
+				else return bluebird.delay(retryTime).then(() => defaultFuncs.post(url, ctx.jar, data.request.formData)).then(parseAndCheckLogin(ctx, defaultFuncs, retryCount));
 			}
-			if (data.statusCode !== 200)
-				throw new CustomError({
-					message: "parseAndCheckLogin got status code: " + data.statusCode + ". Bailing out of trying to parse response.",
-					statusCode: data.statusCode,
-					res: data.body,
-					error: "parseAndCheckLogin got status code: " + data.statusCode + ". Bailing out of trying to parse response.",
-					sourceCall: sourceCall
-				});
+			if (data.statusCode !== 200) throw new Error("parseAndCheckLogin got status code: " + data.statusCode + ". Bailing out of trying to parse response.");
 
-			let res = null;
+			var res = null;
 			try {
 				res = JSON.parse(makeParsable(data.body));
-			} catch (e) {
-				throw new CustomError({
-					message: "JSON.parse error. Check the `detail` property on this error.",
-					detail: e,
-					res: data.body,
+			}
+			catch (e) {
+				throw {
 					error: "JSON.parse error. Check the `detail` property on this error.",
-					sourceCall: sourceCall
-				});
+					detail: e,
+					res: data.body
+				};
 			}
 
 			// In some cases the response contains only a redirect URL which should be followed
-			if (res.redirect && data.request.method === "GET") {
-				return defaultFuncs
-					.get(res.redirect, ctx.jar)
-					.then(parseAndCheckLogin(ctx, defaultFuncs, undefined, sourceCall));
-			}
+			if (res.redirect && data.request.method === "GET") return defaultFuncs.get(res.redirect, ctx.jar).then(parseAndCheckLogin(ctx, defaultFuncs));
 
 			// TODO: handle multiple cookies?
-			if (
-				res.jsmods &&
-				res.jsmods.require &&
-				Array.isArray(res.jsmods.require[0]) &&
-				res.jsmods.require[0][0] === "Cookie"
-			) {
-				res.jsmods.require[0][3][0] = res.jsmods.require[0][3][0].replace(
-					"_js_",
-					""
-				);
-				const cookie = formatCookie(res.jsmods.require[0][3], "facebook");
-				const cookie2 = formatCookie(res.jsmods.require[0][3], "messenger");
+			if (res.jsmods && res.jsmods.require && Array.isArray(res.jsmods.require[0]) && res.jsmods.require[0][0] === "Cookie") {
+				res.jsmods.require[0][3][0] = res.jsmods.require[0][3][0].replace("_js_", "");
+				var cookie = formatCookie(res.jsmods.require[0][3], "facebook");
+				var cookie2 = formatCookie(res.jsmods.require[0][3], "messenger");
 				ctx.jar.setCookie(cookie, "https://www.facebook.com");
 				ctx.jar.setCookie(cookie2, "https://www.messenger.com");
 			}
@@ -1323,29 +1259,19 @@ function parseAndCheckLogin(ctx, defaultFuncs, retryCount, sourceCall) {
 			// On every request we check if we got a DTSG and we mutate the context so that we use the latest
 			// one for the next requests.
 			if (res.jsmods && Array.isArray(res.jsmods.require)) {
-				const arr = res.jsmods.require;
-				for (const i in arr) {
+				var arr = res.jsmods.require;
+				for (var i in arr) {
 					if (arr[i][0] === "DTSG" && arr[i][1] === "setToken") {
 						ctx.fb_dtsg = arr[i][3][0];
 
 						// Update ttstamp since that depends on fb_dtsg
 						ctx.ttstamp = "2";
-						for (let j = 0; j < ctx.fb_dtsg.length; j++) {
-							ctx.ttstamp += ctx.fb_dtsg.charCodeAt(j);
-						}
+						for (var j = 0; j < ctx.fb_dtsg.length; j++) ctx.ttstamp += ctx.fb_dtsg.charCodeAt(j);
 					}
 				}
 			}
 
-			if (res.error === 1357001) {
-				throw new CustomError({
-					message: "Facebook blocked login. Please visit https://facebook.com and check your account.",
-					error: "Not logged in.",
-					res: res,
-					statusCode: data.statusCode,
-					sourceCall: sourceCall
-				});
-			}
+			if (res.error === 1357001) throw { error: "Not logged in." };
 			return res;
 		});
 	};
