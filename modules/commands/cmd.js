@@ -1,4 +1,4 @@
-npmmodule.exports.config = {
+module.exports.config = {
     name: "cmd",
     version: "1.0.0",
     hasPermssion: 2,
