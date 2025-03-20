@@ -56,6 +56,7 @@ Sau đây là các bước cơ bản để có thể cài đặt và vận hành
     
 5. Lấy cookie
     - Bạn có thể sử dụng cookie từ extension, hoặc f12 lên để lấy cookie
+    - Tạo file cookie.txt và paste cookie vào, save để lưu
       
 6. Chạy bot và tận hưởng
     1. Nhập
