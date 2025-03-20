@@ -31,11 +31,7 @@ module.exports.handleEvent = async function ({ api, event, client }) {
     lowerBody === "dùng sao"
   ) {
     api.sendMessage(
-      `✏️ Prefix của nhóm: ${prefix}\n📎 Prefix hệ thống: ${PREFIX}\n📝 Tổng có: ${
-        client.commands.size
-      } lệnh\n👥 Tổng người dùng bot: ${
-        global.data.allUserID.length
-      }\n🏘️ Tổng nhóm: ${global.data.allThreadID.length}\n────────────────\n⏰ ${gio}`,
+      `✏️ Prefix của nhóm: ${prefix}\n📎 Prefix hệ thống: ${PREFIX}`,
       threadID,
       event.messageID
     );
