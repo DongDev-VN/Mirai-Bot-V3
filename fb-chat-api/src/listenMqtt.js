@@ -3,109 +3,140 @@
 const utils = require("../utils");
 const log = require("npmlog");
 const mqtt = require('mqtt');
-const websocket = require('websocket-stream');
+const WebSocket = require('ws');
 const HttpsProxyAgent = require('https-proxy-agent');
 const EventEmitter = require('events');
+const Duplexify = require('duplexify');
+const {
+  Transform
+} = require('stream');
 const debugSeq = false;
 var identity = function() {};
 var form = {};
 var getSeqId = function() {};
-
-const topics = [
-  "/legacy_web",
-  "/webrtc",
-  "/rtc_multi",
-  "/onevc",
-  "/br_sr", //Notification
-  //Need to publish /br_sr right after this
-  "/sr_res",
-  "/t_ms",
-  "/thread_typing",
-  "/orca_typing_notifications",
-  "/notify_disconnect",
-  //Need to publish /messenger_sync_create_queue right after this
-  "/orca_presence",
-  //Will receive /sr_res right here.
-
-  "/legacy_web_mtouch"
-  // "/inbox",
-  // "/mercury",
-  // "/messaging_events",
-  // "/orca_message_notifications",
-  // "/pp",
-  // "/webrtc_response",
-];
-
+const topics = ['/ls_req', '/ls_resp', '/legacy_web', '/webrtc', '/rtc_multi', '/onevc', '/br_sr', '/sr_res', '/t_ms', '/thread_typing', '/orca_typing_notifications', '/notify_disconnect', '/orca_presence', '/inbox', '/mercury', '/messaging_events', '/orca_message_notifications', '/pp', '/webrtc_response'];
+let WebSocket_Global;
+function buildProxy() {
+  const Proxy = new Transform({
+    objectMode: false,
+    transform(chunk, enc, next) {
+      if (WebSocket_Global.readyState !== WebSocket_Global.OPEN) {
+        return next();
+      }
+      let data;
+      if (typeof chunk === 'string') {
+        data = Buffer.from(chunk, 'utf8');
+      } else {
+        data = chunk;
+      }
+      WebSocket_Global.send(data);
+      next();
+    },
+    flush(done) {
+      WebSocket_Global.close();
+      done();
+    },
+    writev(chunks, cb) {
+      const buffers = chunks.map(({ chunk }) => {
+        if (typeof chunk === 'string') {
+          return Buffer.from(chunk, 'utf8');
+        }
+        return chunk;
+      });
+      this._write(Buffer.concat(buffers), 'binary', cb);
+    },
+  });
+  return Proxy;
+}
+function buildStream(options, WebSocket, Proxy) {
+  const Stream = Duplexify(undefined, undefined, options);
+  Stream.socket = WebSocket;
+  WebSocket.onclose = () => {
+    Stream.end();
+    Stream.destroy();
+  };
+  WebSocket.onerror = (err) => {
+    Stream.destroy(err);
+  };
+  WebSocket.onmessage = (event) => {
+    const data = event.data instanceof ArrayBuffer ? Buffer.from(event.data) : Buffer.from(event.data, 'utf8');
+    Stream.push(data);
+  };
+  WebSocket.onopen = () => {
+    Stream.setReadable(Proxy);
+    Stream.setWritable(Proxy);
+    Stream.emit('connect');
+  };
+  WebSocket_Global = WebSocket;
+  Proxy.on('close', () => WebSocket.close());
+  return Stream;
+}
 function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
-  //Don't really know what this does but I think it's for the active state?
-  //TODO: Move to ctx when implemented
   const chatOn = ctx.globalOptions.online;
   const foreground = false;
-
-  const sessionID = Math.floor(Math.random() * 9007199254740991) + 1;
+  const sessionID = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER) + 1;
+  const GUID = utils.getGUID();
   const username = {
-    u: ctx.i_userID || ctx.userID,
+    u: ctx.userID,
     s: sessionID,
     chat_on: chatOn,
     fg: foreground,
-    d: utils.getGUID(),
-    ct: "websocket",
-    //App id from facebook
-    aid: "219994525426954",
-    mqtt_sid: "",
+    d: GUID,
+    ct: 'websocket',
+    aid: '219994525426954',
+    aids: null,
+    mqtt_sid: '',
     cp: 3,
     ecp: 10,
     st: [],
     pm: [],
-    dc: "",
+    dc: '',
     no_auto_fg: true,
     gas: null,
     pack: [],
-    a: ctx.globalOptions.userAgent,
-    aids: null
+    p: null,
+    php_override: ""
   };
-  const cookies = ctx.jar.getCookies("https://www.facebook.com").join("; ");
-
+  const cookies = ctx.jar.getCookies('https://www.facebook.com').join('; ');
   let host;
   if (ctx.mqttEndpoint) {
-    host = `${ctx.mqttEndpoint}&sid=${sessionID}`;
+    host = `${ctx.mqttEndpoint}&sid=${sessionID}&cid=${GUID}`;
   } else if (ctx.region) {
-    host = `wss://edge-chat.facebook.com/chat?region=${ctx.region.toLocaleLowerCase()}&sid=${sessionID}`;
+    host = `wss://edge-chat.facebook.com/chat?region=${ctx.region.toLowerCase()}&sid=${sessionID}&cid=${GUID}`;
   } else {
-    host = `wss://edge-chat.facebook.com/chat?sid=${sessionID}`;
+    host = `wss://edge-chat.facebook.com/chat?sid=${sessionID}&cid=${GUID}`;
   }
-
   const options = {
-    clientId: "mqttwsclient",
+    clientId: 'mqttwsclient',
     protocolId: 'MQIsdp',
     protocolVersion: 3,
     username: JSON.stringify(username),
     clean: true,
     wsOptions: {
       headers: {
-        'Cookie': cookies,
-        'Origin': 'https://www.facebook.com',
-        'User-Agent': ctx.globalOptions.userAgent,
-        'Referer': 'https://www.facebook.com/',
-        'Host': new URL(host).hostname //'edge-chat.facebook.com'
+        Cookie: cookies,
+        Origin: 'https://www.facebook.com',
+        'User-Agent': ctx.globalOptions.userAgent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36',
+        Referer: 'https://www.facebook.com/',
+        Host: new URL(host).hostname,
       },
       origin: 'https://www.facebook.com',
-      protocolVersion: 13
+      protocolVersion: 13,
+      binaryType: 'arraybuffer',
     },
-    keepalive: 10,
-    reschedulePings: false
+    keepalive: 60,
+    reschedulePings: true,
+    reconnectPeriod: 2000,
+    connectTimeout: 10000,
   };
-
   if (typeof ctx.globalOptions.proxy != "undefined") {
     const agent = new HttpsProxyAgent(ctx.globalOptions.proxy);
     options.wsOptions.agent = agent;
   }
-
-  ctx.mqttClient = new mqtt.Client(_ => websocket(host, options.wsOptions), options);
-
+  ctx.mqttClient = new mqtt.Client(() => buildStream(options, new WebSocket(host, options.wsOptions), buildProxy()), options);
   const mqttClient = ctx.mqttClient;
-
-  mqttClient.on('error', function(err) {
+  global.mqttClient = mqttClient;
+  mqttClient.on('error', function (err) {
     log.error("listenMqtt", err);
     mqttClient.end();
     if (ctx.globalOptions.autoReconnect) {
@@ -127,12 +158,12 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
     }
   });
 
-  mqttClient.on('close', function() {
+  mqttClient.on('close', function () {
 
   });
 
-  mqttClient.on('connect', function() {
-    topics.forEach(function(topicsub) {
+  mqttClient.on('connect', function () {
+    topics.forEach(function (topicsub) {
       mqttClient.subscribe(topicsub);
     });
 
@@ -172,12 +203,12 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
       qos: 1
     });
 
-    const rTimeout = setTimeout(function() {
+    const rTimeout = setTimeout(function () {
       mqttClient.end();
       listenMqtt(defaultFuncs, api, ctx, globalCallback);
     }, 5000);
 
-    ctx.tmsWait = function() {
+    ctx.tmsWait = function () {
       clearTimeout(rTimeout);
       ctx.globalOptions.emitReady ? globalCallback({
         type: "ready",
@@ -188,7 +219,7 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
 
   });
 
-  mqttClient.on('message', function(topic, message, _packet) {
+  mqttClient.on('message', function (topic, message, _packet) {
     let jsonMessage = Buffer.isBuffer(message) ? Buffer.from(message).toString() : message;
     try {
       jsonMessage = JSON.parse(jsonMessage);
@@ -236,7 +267,7 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
         from: jsonMessage.sender_fbid.toString(),
         threadID: utils.formatID((jsonMessage.thread || jsonMessage.sender_fbid).toString())
       };
-      (function() {
+      (function () {
         globalCallback(null, typ);
       })();
     } else if (topic === "/orca_presence") {
@@ -252,7 +283,7 @@ function listenMqtt(defaultFuncs, api, ctx, globalCallback) {
             timestamp: data["l"] * 1000,
             statuses: data["p"]
           };
-          (function() {
+          (function () {
             globalCallback(null, presence);
           })();
         }
@@ -292,7 +323,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
         return !ctx.globalOptions.selfListen &&
           (fmtMsg.senderID === ctx.i_userID || fmtMsg.senderID === ctx.userID) ?
           undefined :
-          (function() {
+          (function () {
             globalCallback(null, fmtMsg);
           })();
       } else {
@@ -323,13 +354,13 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
       for (const i in clientPayload.deltas) {
         const delta = clientPayload.deltas[i];
         if (delta.deltaMessageReaction && !!ctx.globalOptions.listenEvents) {
-          (function() {
+          (function () {
             globalCallback(null, {
               type: "message_reaction",
               threadID: (delta.deltaMessageReaction.threadKey
                 .threadFbId ?
                 delta.deltaMessageReaction.threadKey.threadFbId : delta.deltaMessageReaction.threadKey
-                .otherUserFbId).toString(),
+                  .otherUserFbId).toString(),
               messageID: delta.deltaMessageReaction.messageId,
               reaction: delta.deltaMessageReaction.reaction,
               senderID: delta.deltaMessageReaction.senderId == 0 ? delta.deltaMessageReaction.userId.toString() : delta.deltaMessageReaction.senderId.toString(),
@@ -337,12 +368,12 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
             });
           })();
         } else if (delta.deltaRecallMessageData && !!ctx.globalOptions.listenEvents) {
-          (function() {
+          (function () {
             globalCallback(null, {
               type: "message_unsend",
               threadID: (delta.deltaRecallMessageData.threadKey.threadFbId ?
                 delta.deltaRecallMessageData.threadKey.threadFbId : delta.deltaRecallMessageData.threadKey
-                .otherUserFbId).toString(),
+                  .otherUserFbId).toString(),
               messageID: delta.deltaRecallMessageData.messageID,
               senderID: delta.deltaRecallMessageData.senderID.toString(),
               deletionTimestamp: delta.deltaRecallMessageData.deletionTimestamp,
@@ -350,12 +381,12 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
             });
           })();
         } else if (delta.deltaRemoveMessage && !!ctx.globalOptions.listenEvents) {
-          (function() {
+          (function () {
             globalCallback(null, {
               type: "message_self_delete",
               threadID: (delta.deltaRemoveMessage.threadKey.threadFbId ?
                 delta.deltaRemoveMessage.threadKey.threadFbId : delta.deltaRemoveMessage.threadKey
-                .otherUserFbId).toString(),
+                  .otherUserFbId).toString(),
               messageID: delta.deltaRemoveMessage.messageIds.length == 1 ? delta.deltaRemoveMessage.messageIds[0] : delta.deltaRemoveMessage.messageIds,
               senderID: api.getCurrentUserID(),
               deletionTimestamp: delta.deltaRemoveMessage.deletionTimestamp,
@@ -366,9 +397,9 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
           //Mention block - #1
           let mdata =
             delta.deltaMessageReply.message === undefined ? [] :
-            delta.deltaMessageReply.message.data === undefined ? [] :
-            delta.deltaMessageReply.message.data.prng === undefined ? [] :
-            JSON.parse(delta.deltaMessageReply.message.data.prng);
+              delta.deltaMessageReply.message.data === undefined ? [] :
+                delta.deltaMessageReply.message.data.prng === undefined ? [] :
+                  JSON.parse(delta.deltaMessageReply.message.data.prng);
           let m_id = mdata.map(u => u.i);
           let m_offset = mdata.map(u => u.o);
           let m_length = mdata.map(u => u.l);
@@ -386,10 +417,10 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
             type: "message_reply",
             threadID: (delta.deltaMessageReply.message.messageMetadata.threadKey.threadFbId ?
               delta.deltaMessageReply.message.messageMetadata.threadKey.threadFbId : delta.deltaMessageReply.message.messageMetadata.threadKey
-              .otherUserFbId).toString(),
+                .otherUserFbId).toString(),
             messageID: delta.deltaMessageReply.message.messageMetadata.messageId,
             senderID: delta.deltaMessageReply.message.messageMetadata.actorFbId.toString(),
-            attachments: (delta.deltaMessageReply.message.attachments || []).map(function(att) {
+            attachments: (delta.deltaMessageReply.message.attachments || []).map(function (att) {
               const mercury = JSON.parse(att.mercuryJSON);
               Object.assign(att, mercury);
               return att;
@@ -415,9 +446,9 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
             //Mention block - #2
             mdata =
               delta.deltaMessageReply.repliedToMessage === undefined ? [] :
-              delta.deltaMessageReply.repliedToMessage.data === undefined ? [] :
-              delta.deltaMessageReply.repliedToMessage.data.prng === undefined ? [] :
-              JSON.parse(delta.deltaMessageReply.repliedToMessage.data.prng);
+                delta.deltaMessageReply.repliedToMessage.data === undefined ? [] :
+                  delta.deltaMessageReply.repliedToMessage.data.prng === undefined ? [] :
+                    JSON.parse(delta.deltaMessageReply.repliedToMessage.data.prng);
             m_id = mdata.map(u => u.i);
             m_offset = mdata.map(u => u.o);
             m_length = mdata.map(u => u.l);
@@ -434,10 +465,10 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
             callbackToReturn.messageReply = {
               threadID: (delta.deltaMessageReply.repliedToMessage.messageMetadata.threadKey.threadFbId ?
                 delta.deltaMessageReply.repliedToMessage.messageMetadata.threadKey.threadFbId : delta.deltaMessageReply.repliedToMessage.messageMetadata.threadKey
-                .otherUserFbId).toString(),
+                  .otherUserFbId).toString(),
               messageID: delta.deltaMessageReply.repliedToMessage.messageMetadata.messageId,
               senderID: delta.deltaMessageReply.repliedToMessage.messageMetadata.actorFbId.toString(),
-              attachments: delta.deltaMessageReply.repliedToMessage.attachments.map(function(att) {
+              attachments: delta.deltaMessageReply.repliedToMessage.attachments.map(function (att) {
                 const mercury = JSON.parse(att.mercuryJSON);
                 Object.assign(att, mercury);
                 return att;
@@ -520,13 +551,13 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
               .catch((err) => {
                 log.error("forcedFetch", err);
               })
-              .finally(function() {
+              .finally(function () {
                 if (ctx.globalOptions.autoMarkDelivery) {
                   markDelivery(ctx, api, callbackToReturn.threadID, callbackToReturn.messageID);
-                }!ctx.globalOptions.selfListen &&
+                } !ctx.globalOptions.selfListen &&
                   (callbackToReturn.senderID === ctx.i_userID || callbackToReturn.senderID === ctx.userID) ?
                   undefined :
-                  (function() {
+                  (function () {
                     globalCallback(null, callbackToReturn);
                   })();
               });
@@ -541,7 +572,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
           return !ctx.globalOptions.selfListen &&
             (callbackToReturn.senderID === ctx.i_userID || callbackToReturn.senderID === ctx.userID) ?
             undefined :
-            (function() {
+            (function () {
               globalCallback(null, callbackToReturn);
             })();
         }
@@ -568,7 +599,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
           type: "parse_error"
         });
       }
-      return (function() {
+      return (function () {
         globalCallback(null, fmtMsg);
       })();
     case "AdminTextMessage":
@@ -594,13 +625,13 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
               type: "parse_error"
             });
           }
-          return (function() {
+          return (function () {
             globalCallback(null, fmtMsg);
           })();
         default:
           return;
       }
-      //For group images
+    //For group images
     case "ForcedFetch":
       if (!v.delta.threadKey) return;
       var mid = v.delta.messageId;
@@ -645,7 +676,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
                 case "ThreadImageMessage":
                   (!ctx.globalOptions.selfListenEvent && (fetchData.message_sender.id.toString() === ctx.i_userID || fetchData.message_sender.id.toString() === ctx.userID)) || !ctx.loggedIn ?
                     undefined :
-                    (function() {
+                    (function () {
                       globalCallback(null, {
                         type: "event",
                         threadID: utils.formatID(tid.toString()),
@@ -749,7 +780,7 @@ function parseDelta(defaultFuncs, api, ctx, globalCallback, v) {
       }
       return (!ctx.globalOptions.selfListenEvent && (formattedEvent.author.toString() === ctx.i_userID || formattedEvent.author.toString() === ctx.userID)) || !ctx.loggedIn ?
         undefined :
-        (function() {
+        (function () {
           globalCallback(null, formattedEvent);
         })();
   }
@@ -773,7 +804,7 @@ function markDelivery(ctx, api, threadID, messageID) {
   }
 }
 
-module.exports = function(defaultFuncs, api, ctx) {
+module.exports = function (defaultFuncs, api, ctx) {
   let globalCallback = identity;
   let sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   getSeqId = function getSeqId() {
@@ -888,18 +919,18 @@ module.exports = function(defaultFuncs, api, ctx) {
         return globalCallback(err);
       });
   }
-  return function(callback) {
+  return function (callback) {
     class MessageEmitter extends EventEmitter {
       stopListening(callback) {
 
-        callback = callback || (() => {});
+        callback = callback || (() => { });
         globalCallback = identity;
         if (ctx.mqttClient) {
           ctx.mqttClient.unsubscribe("/webrtc");
           ctx.mqttClient.unsubscribe("/rtc_multi");
           ctx.mqttClient.unsubscribe("/onevc");
           ctx.mqttClient.publish("/browser_close", "{}");
-          ctx.mqttClient.end(false, function(...data) {
+          ctx.mqttClient.end(false, function (...data) {
             callback(data);
             ctx.mqttClient = undefined;
           });
@@ -914,7 +945,7 @@ module.exports = function(defaultFuncs, api, ctx) {
     }
 
     const msgEmitter = new MessageEmitter();
-    globalCallback = (callback || function(error, message) {
+    globalCallback = (callback || function (error, message) {
       if (error) {
         return msgEmitter.emit("error", error);
       }

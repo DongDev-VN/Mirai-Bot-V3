@@ -12,27 +12,31 @@ module.exports.config = {
   cooldowns: 0
 };
 
-module.exports.handleEvent = async function ({ api, event }) {
+module.exports.handleEvent = async function ({ api, event, client }) {
   const { threadID, body } = event;
+  if (!body) return;
+
   const { PREFIX } = global.config;
   const gio = moment.tz("Asia/Ho_Chi_Minh").format("HH:mm:ss || DD/MM/YYYY");
 
   let threadSetting = global.data.threadData.get(threadID) || {};
   let prefix = threadSetting.PREFIX || PREFIX;
 
+  const lowerBody = body.toLowerCase();
+
   if (
-    body.toLowerCase() === "prefix" ||
-    body.toLowerCase() === "prefix bot là gì" ||
-    body.toLowerCase() === "quên prefix r" ||
-    body.toLowerCase() === "dùng sao"
+    lowerBody === "prefix" ||
+    lowerBody === "prefix bot là gì" ||
+    lowerBody === "quên prefix r" ||
+    lowerBody === "dùng sao"
   ) {
     api.sendMessage(
-      `✏️ Prefix của nhóm: ${prefix}\n📎 Prefix hệ thống: ${global.config.PREFIX}\n📝 Tổng có: ${
+      `✏️ Prefix của nhóm: ${prefix}\n📎 Prefix hệ thống: ${PREFIX}\n📝 Tổng có: ${
         client.commands.size
       } lệnh\n👥 Tổng người dùng bot: ${
         global.data.allUserID.length
       }\n🏘️ Tổng nhóm: ${global.data.allThreadID.length}\n────────────────\n⏰ ${gio}`,
-      event.threadID,
+      threadID,
       event.messageID
     );
   }

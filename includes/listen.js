@@ -90,7 +90,6 @@ module.exports = function({
     };
   }, {});
   return async function(event) {
-console.log(event);
     const a = path.join(__dirname, '/../utils/data/approvedThreads.json');
     const b = path.join(__dirname, '/../utils/data/pendingThreads.json');
     if (!fs.existsSync(a)) {
