@@ -2,9 +2,10 @@ const { readdirSync, readFileSync, writeFileSync, existsSync, unlinkSync, rm } =
 const { join, resolve } = require("path");
 const { execSync } = require('child_process');
 const logger = require("./utils/log.js");
-const login = require("./fb-chat-api");
-const axios = require("axios");
+//const login = require("../fca-unofficial");
+const login = require('@dongdev/fca-unofficial')
 const fs = require('fs-extra');
+const moment = require('moment-timezone');
 if (!fs.existsSync('./utils/data')) {
   fs.mkdirSync('./utils/data', { recursive: true });
 }
@@ -88,7 +89,7 @@ function onBot({ models }) {
                   }  
                   if (global.client[collection].has(config.name)) {
                     throw new Error(`Tên ${type === 'commands' ? 'lệnh' : 'sự kiện'} đã tồn tại: ${config.name}`);
-                  } 
+                  }
                   if (config.envConfig) {
                     global.configModule[config.name] = global.configModule[config.name] || {};
                     global.config[config.name] = global.config[config.name] || {};  
@@ -104,6 +105,9 @@ function onBot({ models }) {
                 } catch (error) {
                   console.error(`Lỗi khi tải ${type === 'commands' ? 'lệnh' : 'sự kiện'} ${file}:`, error);
                 }
+              }
+              if (loadedCount === 0) {
+                console.log(`Không tìm thấy ${type === 'commands'? 'lệnh' :'sự kiện'} nào trong thư mục ${path}`); 
               }
               return loadedCount;
             };
@@ -134,7 +138,8 @@ function onBot({ models }) {
                 if (res.data.fb_scraping_warning_clear.success) {
                   logger("Đã vượt cảnh cáo facebook thành công.", "[ SUCCESS ] >");
                   global.handleListen = api.listenMqtt(listenerCallback);
-                  setTimeout(() => (mqttClient.end(), connect_mqtt()), 1000 * 60 * 60 * 6);
+                  setTimeout(() => (mqttClient.end(), connect_mqtt()), 1000 * 60 * 60 * 1);
+                  logger(global.getText('mirai', 'successConnectMQTT'), '[ MQTT ]');
                 }
               });
             } else {
@@ -147,7 +152,8 @@ function onBot({ models }) {
         }
         function connect_mqtt() {
           global.handleListen = api.listenMqtt(listenerCallback);
-          setTimeout(() => (mqttClient.end(), connect_mqtt()), 1000 * 60 * 60 * 6);
+          setTimeout(() => (mqttClient.end(), connect_mqtt()), 1000 * 60 * 60 * 1);
+          logger(global.getText('mirai', 'successConnectMQTT'), '[ MQTT ]');
         }
         connect_mqtt();
     });

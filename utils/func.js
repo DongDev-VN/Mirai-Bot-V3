@@ -9,7 +9,7 @@ const utils = {
         return global.client.api.sendMessage(global.getText("utils", "throwError", ((threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : global.config.PREFIX), command), threadID, messageID);
     },
 
-    parseCookies: function(cookies) {
+    parseCookies: function (cookies) {
         return (cookies.includes('useragent=') ? cookies.split('useragent=')[0] : cookies).split(';').map(pair => {
             const [key, value] = pair.trim().split('=');
             return value !== undefined ? {
@@ -54,7 +54,7 @@ const utils = {
         });
     },
 
-    getContent: async function(url) {
+    getContent: async function (url) {
         try {
             const response = await axios({
                 method: 'GET',
@@ -76,13 +76,13 @@ const utils = {
     },
 
     AES: {
-        encrypt (cryptKey, crpytIv, plainData) {
+        encrypt(cryptKey, crpytIv, plainData) {
             var encipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(cryptKey), Buffer.from(crpytIv));
             var encrypted = encipher.update(plainData);
             encrypted = Buffer.concat([encrypted, encipher.final()]);
             return encrypted.toString('hex');
         },
-        decrypt (cryptKey, cryptIv, encrypted) {
+        decrypt(cryptKey, cryptIv, encrypted) {
             encrypted = Buffer.from(encrypted, "hex");
             var decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(cryptKey), Buffer.from(cryptIv, 'binary'));
             var decrypted = decipher.update(encrypted);
@@ -91,7 +91,7 @@ const utils = {
 
             return String(decrypted);
         },
-        makeIv () { return Buffer.from(crypto.randomBytes(16)).toString('hex').slice(0, 16); }
+        makeIv() { return Buffer.from(crypto.randomBytes(16)).toString('hex').slice(0, 16); }
     },
 
     homeDir: function () {

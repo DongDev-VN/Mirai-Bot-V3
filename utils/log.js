@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-const gradient = require("gradient-string")
+const gradient = require("gradient-string");
 const themes = [
   'blue',
   'dream2',
@@ -20,36 +20,28 @@ const themes = [
   'ghost',
   'hacker'
 ];
-
 const theme = themes[Math.floor(Math.random() * themes.length)];
 let co;
 let error;
 if (theme.toLowerCase() === 'blue') {
   co = gradient([{ color: "#1affa3", pos: 0.2 }, { color: "cyan", pos: 0.4 }, { color: "pink", pos: 0.6 }, { color: "cyan", pos: 0.8 }, { color: '#1affa3', pos: 1 }]);
   error = chalk.red.bold;
-}
-
-else if (theme == "dream2") {
+} else if (theme == "dream2") {
   cra = gradient("blue", "pink")
   co = gradient("#a200ff", "#21b5ff", "#a200ff")
-}
-else if (theme.toLowerCase() === 'dream') {
+} else if (theme.toLowerCase() === 'dream') {
   co = gradient([{ color: "blue", pos: 0.2 }, { color: "pink", pos: 0.3 }, { color: "gold", pos: 0.6 }, { color: "pink", pos: 0.8 }, { color: "blue", pos: 1 }]);
   error = chalk.red.bold;
-}
-else if (theme.toLowerCase() === 'fiery') {
+} else if (theme.toLowerCase() === 'fiery') {
   co = gradient("#fc2803", "#fc6f03", "#fcba03");
   error = chalk.red.bold;
-}
-else if (theme.toLowerCase() === 'rainbow') {
+} else if (theme.toLowerCase() === 'rainbow') {
   co = gradient.rainbow
   error = chalk.red.bold;
-}
-else if (theme.toLowerCase() === 'pastel') {
+} else if (theme.toLowerCase() === 'pastel') {
   co = gradient.pastel
   error = chalk.red.bold;
-}
-else if (theme.toLowerCase() === 'cristal') {
+} else if (theme.toLowerCase() === 'cristal') {
   co = gradient.cristal
   error = chalk.red.bold;
 } else if (theme.toLowerCase() === 'red') {
@@ -82,8 +74,7 @@ else if (theme.toLowerCase() === 'cristal') {
 } else if (theme === 'hacker') {
   cra = chalk.hex('#4be813');
   co = gradient('#47a127', '#0eed19', '#27f231');
-}
-else {
+} else {
   co = gradient("#243aff", "#4687f0", "#5800d4");
   error = chalk.red.bold;
 }
@@ -100,7 +91,6 @@ module.exports = (text, type) => {
       break;
   }
 };
-
 module.exports.loader = (data, option) => {
   switch (option) {
     case "warn":
@@ -114,10 +104,8 @@ module.exports.loader = (data, option) => {
       break;
   }
 }
-
 module.exports.load = (data, option) => {
   let coloredData = '';
-
   switch (option) {
     case 'warn':
       coloredData = gradient("blue", "purple", "yellow", "#81ff6e")('[ LOGIN ] >' + data);

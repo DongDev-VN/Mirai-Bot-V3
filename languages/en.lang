@@ -31,6 +31,7 @@ mirai.warningSourceCode=DETECTED THAT SOURCE CODE'S STRUCTURE HAD BEEN CHANGED ,
 mirai.refreshListen=Refreshed handleListener...
 mirai.successConnectDatabase=Connected to database successfully!
 mirai.failConnectDatabase=Failed to connect to database, error: %1
+mirai.successConnectMQTT=Connect MQTT succes
 
 # includes/listen.js
 

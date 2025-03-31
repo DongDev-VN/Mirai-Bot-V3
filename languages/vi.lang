@@ -31,6 +31,7 @@ mirai.warningSourceCode=PHÁT HIỆN SOURCE CODE ĐÃ BỊ THAY ĐỔI CẤU TR�
 mirai.refreshListen=Đã làm mới lại handleListener...
 mirai.successConnectDatabase=Kết nối đến cơ sở dữ liệu thành công
 mirai.failConnectDatabase=Kết nối đến cơ sở dữ liệu thất bại, lỗi: %1
+mirai.successConnectMQTT=Đã kết nối MQTT
 
 # includes/listen.js
 
